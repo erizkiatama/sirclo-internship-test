@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index Berat</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 25%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+<body>
+    {{if .Error}}
+    <h1>{{.Error}}</h1>
+    {{else}}
+    <table>
+        <tr>
+            <th>Tanggal</th>
+            <th>Max</th>
+            <th>Min</th>
+            <th>Perbedaan</th>
+        </tr>
+        {{range .Data}}
+        <tr>
+            <td><a href="/weight/{{.ID}}">{{.Date}}</a></td>
+            <td>{{.Max}}</td>
+            <td>{{.Min}}</td>
+            <td>{{.Difference}}</td>
+        </tr>
+        {{end}}
+        <tr>
+            <th>Rata-Rata</th>
+            <th>{{.AverageMax}}</th>
+            <th>{{.AverageMin}}</th>
+            <th>{{.AverageDiff}}</th>
+        </tr>
+    </table>
+    {{end}}
+</body>
+
+</html>
