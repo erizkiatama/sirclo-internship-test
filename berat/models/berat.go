@@ -9,7 +9,7 @@ import (
 
 type Weight struct {
 	ID        uint64    `gorm:"primary_key;auto_increment"`
-	Date      time.Time `gorm:"not null;unique"`
+	Date      string    `gorm:"not null;unique"`
 	Max       int       `gorm:"not null"`
 	Min       int       `gorm:"not null"`
 	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
@@ -17,11 +17,11 @@ type Weight struct {
 }
 
 type WeightRepository struct {
-	db *gorm.DB
+	DB *gorm.DB
 }
 
 func (w *Weight) Validate() error {
-	if w.Date.IsZero() {
+	if w.Date == "" {
 		return errors.New("Required date")
 	}
 
@@ -41,7 +41,7 @@ func (w *Weight) Validate() error {
 }
 
 func (wr *WeightRepository) Save(weight *Weight) (*Weight, error) {
-	err := wr.db.Create(&weight).Error
+	err := wr.DB.Create(&weight).Error
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (wr *WeightRepository) Save(weight *Weight) (*Weight, error) {
 func (wr *WeightRepository) FindAll() (*[]Weight, error) {
 	var weights []Weight
 
-	err := wr.db.Find(&weights).Error
+	err := wr.DB.Find(&weights).Error
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (wr *WeightRepository) FindAll() (*[]Weight, error) {
 func (wr *WeightRepository) FindByID(id uint64) (*Weight, error) {
 	var weight Weight
 
-	err := wr.db.Where("id = ?", id).Take(&weight).Error
+	err := wr.DB.Where("id = ?", id).Take(&weight).Error
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (wr *WeightRepository) FindByID(id uint64) (*Weight, error) {
 }
 
 func (wr *WeightRepository) Update(id uint64, newWeight *Weight) (*Weight, error) {
-	err := wr.db.Where("id = ?", id).Updates(&newWeight).Error
+	err := wr.DB.Where("id = ?", id).Updates(&newWeight).Error
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (wr *WeightRepository) Update(id uint64, newWeight *Weight) (*Weight, error
 }
 
 func (wr *WeightRepository) Delete(id uint64) error {
-	err := wr.db.Where("id = ?", id).Delete(&Weight{}).Error
+	err := wr.DB.Where("id = ?", id).Delete(&Weight{}).Error
 	if err != nil {
 		return err
 	}
