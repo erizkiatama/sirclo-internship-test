@@ -143,3 +143,77 @@ func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, url, http.StatusMovedPermanently)
 	}
 }
+
+func (wc *WeightController) Edit(w http.ResponseWriter, r *http.Request) {
+	weight := new(models.Weight)
+	res := &Response{Data: weight}
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
+	}
+
+	weightID := uint64(id)
+
+	weight, err = wc.WeightRepo.FindByID(weightID)
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusNotFound)
+		return
+	}
+
+	res.Data = weight
+	tmpl.ExecuteTemplate(w, "edit.html", res)
+
+}
+
+func (wc *WeightController) Update(w http.ResponseWriter, r *http.Request) {
+	weight := new(models.Weight)
+	res := &Response{Data: weight}
+	var (
+		date       string
+		max        int
+		min        int
+		difference int
+	)
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
+	}
+
+	if r.Method == "POST" {
+		date = r.FormValue("date")
+		max, _ = strconv.Atoi(r.FormValue("max"))
+		min, _ = strconv.Atoi(r.FormValue("min"))
+		difference = max - min
+
+		weight.ID = uint64(id)
+		weight.Date = date
+		weight.Max = max
+		weight.Min = min
+		weight.Difference = difference
+
+		err := weight.Validate()
+		if err != nil {
+			res.Error = err.Error()
+			tmpl.ExecuteTemplate(w, "edit.html", res)
+			return
+
+		}
+
+		newWeight, err := wc.WeightRepo.Update(weight.ID, weight)
+		if err != nil {
+			res.Error = err.Error()
+			tmpl.ExecuteTemplate(w, "edit.html", res)
+			return
+		}
+
+		url := fmt.Sprintf("/weight/%d", newWeight.ID)
+
+		http.Redirect(w, r, url, http.StatusMovedPermanently)
+	}
+}

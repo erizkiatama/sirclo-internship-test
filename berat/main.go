@@ -48,6 +48,8 @@ func main() {
 	router.HandleFunc("/weight/new", weightController.New).Methods("GET")
 	router.HandleFunc("/weight/insert", weightController.Insert).Methods("POST")
 	router.HandleFunc("/weight/{id}", weightController.Detail).Methods("GET")
+	router.HandleFunc("/weight/{id}/edit", weightController.Edit).Methods("GET")
+	router.HandleFunc("/weight/{id}/update", weightController.Update).Methods("POST")
 
 	fmt.Println("Listening to port 8000")
 	log.Fatal(http.ListenAndServe(":8000", router))
