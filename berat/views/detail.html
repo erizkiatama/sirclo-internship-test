@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weight - {{.Data.ID}}</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 25%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+    {{if .Error}}
+    <h1>{{.Error}}</h1>
+    {{else}}
+    <table>
+        <tr>
+            <th>Tanggal</th>
+            <th>{{.Data.Date}}</th>
+        </tr>
+        <tr>
+            <td>Max</td>
+            <td>{{.Data.Max}}</td>
+        </tr>
+        <tr>
+            <td>Min</td>
+            <td>{{.Data.Min}}</td>
+        </tr>
+        <tr>
+            <td>Perbedaan</td>
+            <td>{{.Data.Difference}}</td>
+        </tr>
+    </table>
+    {{end}}
+</body>
+</html>

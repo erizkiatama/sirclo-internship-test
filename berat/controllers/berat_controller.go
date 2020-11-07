@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 	"text/template"
 
 	"github.com/erizkiatama/berat/models"
+	"github.com/gorilla/mux"
 )
 
 type Response struct {
@@ -47,4 +50,28 @@ func (wc *WeightController) Index(w http.ResponseWriter, r *http.Request) {
 	res.AverageDiff = totalDiff / size
 
 	tmpl.ExecuteTemplate(w, "index.html", res)
+}
+
+func (wc *WeightController) Detail(w http.ResponseWriter, r *http.Request) {
+	res := new(Response)
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		res.Error = err.Error()
+		tmpl.ExecuteTemplate(w, "detail.html", res)
+	}
+
+	weightID := uint64(id)
+
+	weight, err := wc.WeightRepo.FindByID(weightID)
+	if err != nil {
+		res.Error = err.Error()
+		tmpl.ExecuteTemplate(w, "detail.html", res)
+	}
+
+	fmt.Println(weight)
+
+	res.Data = weight
+	tmpl.ExecuteTemplate(w, "detail.html", res)
 }
