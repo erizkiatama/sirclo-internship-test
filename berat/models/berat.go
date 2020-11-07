@@ -7,19 +7,23 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Weight is the model entity for this application
 type Weight struct {
-	ID        uint64    `gorm:"primary_key;auto_increment"`
-	Date      string    `gorm:"not null;unique"`
-	Max       int       `gorm:"not null"`
-	Min       int       `gorm:"not null"`
-	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	ID         uint64    `gorm:"primary_key;auto_increment"`
+	Date       string    `gorm:"not null;unique"`
+	Max        int       `gorm:"not null"`
+	Min        int       `gorm:"not null"`
+	Difference int       `gorm:"not null"`
+	CreatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	UpdatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 }
 
+// WeightRepository is the our wrapper for doing transaction to database
 type WeightRepository struct {
 	DB *gorm.DB
 }
 
+// Validate will check all validation needed for Weight model.
 func (w *Weight) Validate() error {
 	if w.Date == "" {
 		return errors.New("Required date")
@@ -40,6 +44,8 @@ func (w *Weight) Validate() error {
 	return nil
 }
 
+// Save accept Weight as parameter and save it to database
+// It will return saved data if success and error if failed
 func (wr *WeightRepository) Save(weight *Weight) (*Weight, error) {
 	err := wr.DB.Create(&weight).Error
 	if err != nil {
@@ -49,6 +55,7 @@ func (wr *WeightRepository) Save(weight *Weight) (*Weight, error) {
 	return weight, nil
 }
 
+// FindAll will get all Weight data from database
 func (wr *WeightRepository) FindAll() (*[]Weight, error) {
 	var weights []Weight
 
@@ -60,6 +67,8 @@ func (wr *WeightRepository) FindAll() (*[]Weight, error) {
 	return &weights, nil
 }
 
+// FindByID accept id type uint64 as parameter
+// It will get Weight data based on the id
 func (wr *WeightRepository) FindByID(id uint64) (*Weight, error) {
 	var weight Weight
 
@@ -71,6 +80,8 @@ func (wr *WeightRepository) FindByID(id uint64) (*Weight, error) {
 	return &weight, nil
 }
 
+// Update accept id type uint64 and Weight data as parameter
+// It will update the weight data in database based on the id
 func (wr *WeightRepository) Update(id uint64, newWeight *Weight) (*Weight, error) {
 	err := wr.DB.Where("id = ?", id).Updates(&newWeight).Error
 	if err != nil {
@@ -80,6 +91,8 @@ func (wr *WeightRepository) Update(id uint64, newWeight *Weight) (*Weight, error
 	return newWeight, nil
 }
 
+// Delete accept id type uint64 as parameter
+// It will delete the Weight data in database based on the id
 func (wr *WeightRepository) Delete(id uint64) error {
 	err := wr.DB.Where("id = ?", id).Delete(&Weight{}).Error
 	if err != nil {

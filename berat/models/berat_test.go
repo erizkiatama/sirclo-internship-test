@@ -39,11 +39,12 @@ func (s *Suite) SetupSuite() {
 
 func (s *Suite) BeforeTest(_, _ string) {
 	s.weight = &models.Weight{
-		Date:      "2020-11-09",
-		Max:       50,
-		Min:       48,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Date:       "2020-11-09",
+		Max:        50,
+		Min:        48,
+		Difference: 2,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 }
 
@@ -90,13 +91,13 @@ func (s *Suite) Test_Weight_Model_Validate_Success() {
 
 func (s *Suite) Test_Repository_Save_Given_Valid_Weight_Data() {
 	weightID := uint64(10)
-	sqlQuery := `INSERT INTO "weights" ("date","max","min","created_at","updated_at") 
-		VALUES ($1,$2,$3,$4,$5) RETURNING "weights"."id"`
+	sqlQuery := `INSERT INTO "weights" ("date","max","min","difference","created_at","updated_at") 
+		VALUES ($1,$2,$3,$4,$5,$6) RETURNING "weights"."id"`
 	rows := sqlmock.NewRows([]string{"id"}).AddRow(weightID)
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-		WithArgs(s.weight.Date, s.weight.Max, s.weight.Min, s.weight.CreatedAt, s.weight.UpdatedAt).
+		WithArgs(s.weight.Date, s.weight.Max, s.weight.Min, s.weight.Difference, s.weight.CreatedAt, s.weight.UpdatedAt).
 		WillReturnRows(rows)
 	s.mock.ExpectCommit()
 
@@ -111,12 +112,12 @@ func (s *Suite) Test_Repository_Save_Given_Valid_Weight_Data() {
 func (s *Suite) Test_Repository_Save_Given_Invalid_Weight_Data() {
 	s.weight.Date = ""
 
-	sqlQuery := `INSERT INTO "weights" ("date","max","min","created_at","updated_at") 
-		VALUES ($1,$2,$3,$4,$5) RETURNING "weights"."id"`
+	sqlQuery := `INSERT INTO "weights" ("date","max","min","difference","created_at","updated_at") 
+		VALUES ($1,$2,$3,$4,$5,$6) RETURNING "weights"."id"`
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-		WithArgs(s.weight.Date, s.weight.Max, s.weight.Min, s.weight.CreatedAt, s.weight.UpdatedAt).
+		WithArgs(s.weight.Date, s.weight.Max, s.weight.Min, s.weight.Difference, s.weight.CreatedAt, s.weight.UpdatedAt).
 		WillReturnError(gorm.ErrInvalidTransaction)
 
 	res, err := s.repo.Save(s.weight)
@@ -129,10 +130,10 @@ func (s *Suite) Test_Repository_Save_Given_Invalid_Weight_Data() {
 func (s *Suite) Test_Repository_FindAll() {
 	sqlQuery := `SELECT * FROM "weights"`
 	rows := sqlmock.
-		NewRows([]string{"id", "date", "max", "min", "created_at", "updated_at"}).
-		AddRow(1, "2020-11-01", 50, 48, time.Now(), time.Now()).
-		AddRow(2, "2020-11-02", 52, 50, time.Now(), time.Now()).
-		AddRow(3, "2020-11-03", 54, 52, time.Now(), time.Now())
+		NewRows([]string{"id", "date", "max", "min", "difference", "created_at", "updated_at"}).
+		AddRow(1, "2020-11-01", 50, 48, 2, time.Now(), time.Now()).
+		AddRow(2, "2020-11-02", 52, 50, 2, time.Now(), time.Now()).
+		AddRow(3, "2020-11-03", 54, 52, 2, time.Now(), time.Now())
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).WillReturnRows(rows)
 
@@ -167,8 +168,8 @@ func (s *Suite) Test_Repository_FindByID_Given_Valid_ID() {
 
 	sqlQuery := `SELECT * FROM "weights" WHERE (id = $1) LIMIT 1`
 	rows := sqlmock.
-		NewRows([]string{"id", "date", "max", "min", "created_at", "updated_at"}).
-		AddRow(s.weight.ID, s.weight.Date, s.weight.Max, s.weight.Min, s.weight.CreatedAt, s.weight.UpdatedAt)
+		NewRows([]string{"id", "date", "max", "min", "difference", "created_at", "updated_at"}).
+		AddRow(s.weight.ID, s.weight.Date, s.weight.Max, s.weight.Min, s.weight.Difference, s.weight.CreatedAt, s.weight.UpdatedAt)
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).WithArgs(s.weight.ID).WillReturnRows(rows)
 
@@ -191,12 +192,12 @@ func (s *Suite) Test_Repository_FindByID_Given_Invalid_ID() {
 }
 
 func (s *Suite) Test_Repository_Update_Given_Valid_ID() {
-	sqlQuery := `UPDATE "" SET "created_at" = $1, "date" = $2, "max" = $3, "min" = $4, "updated_at" = $5 WHERE (id = $6)`
+	sqlQuery := `UPDATE "" SET "created_at" = $1, "date" = $2, "difference" = $3, "max" = $4, "min" = $5, "updated_at" = $6 WHERE (id = $7)`
 	weightID := uint64(10)
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
-		WithArgs(s.weight.CreatedAt, s.weight.Date, s.weight.Max, s.weight.Min, s.weight.UpdatedAt, weightID).
+		WithArgs(s.weight.CreatedAt, s.weight.Date, s.weight.Difference, s.weight.Max, s.weight.Min, s.weight.UpdatedAt, weightID).
 		WillReturnResult(sqlmock.NewResult(10, 1))
 	s.mock.ExpectCommit()
 
@@ -206,12 +207,12 @@ func (s *Suite) Test_Repository_Update_Given_Valid_ID() {
 }
 
 func (s *Suite) Test_Repository_Update_Given_Invalid_ID() {
-	sqlQuery := `UPDATE "" SET "created_at" = $1, "date" = $2, "max" = $3, "min" = $4, "updated_at" = $5 WHERE (id = $6)`
+	sqlQuery := `UPDATE "" SET "created_at" = $1, "date" = $2, "difference" = $3, "max" = $4, "min" = $5, "updated_at" = $6 WHERE (id = $7)`
 	weightID := uint64(10)
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(sqlQuery)).
-		WithArgs(s.weight.CreatedAt, s.weight.Date, s.weight.Max, s.weight.Min, s.weight.UpdatedAt, weightID).
+		WithArgs(s.weight.CreatedAt, s.weight.Date, s.weight.Difference, s.weight.Max, s.weight.Min, s.weight.UpdatedAt, weightID).
 		WillReturnResult(sqlmock.NewErrorResult(gorm.ErrRecordNotFound))
 
 	res, err := s.repo.Update(weightID, s.weight)
