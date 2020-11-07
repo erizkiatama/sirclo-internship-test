@@ -8,6 +8,7 @@ import (
 
 	"github.com/erizkiatama/berat/models"
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 type Response struct {
@@ -72,4 +73,73 @@ func (wc *WeightController) Detail(w http.ResponseWriter, r *http.Request) {
 
 	res.Data = weight
 	tmpl.ExecuteTemplate(w, "detail.html", res)
+}
+
+func (wc *WeightController) New(w http.ResponseWriter, r *http.Request) {
+	tmpl.ExecuteTemplate(w, "new.html", nil)
+}
+
+func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
+	res := new(Response)
+	weight := new(models.Weight)
+	found := new(models.Weight)
+
+	if r.Method == "POST" {
+		date := r.FormValue("date")
+		max, err := strconv.Atoi(r.FormValue("max"))
+		if err != nil {
+			res.Error = "Please fill the max value correctly"
+			tmpl.ExecuteTemplate(w, "new.html", res)
+			return
+
+		}
+
+		min, err := strconv.Atoi(r.FormValue("min"))
+		if err != nil {
+			res.Error = "Please fill the min value correctly"
+			tmpl.ExecuteTemplate(w, "new.html", res)
+			return
+
+		}
+
+		weight.Date = date
+		weight.Max = max
+		weight.Min = min
+		weight.Difference = weight.Max - weight.Min
+
+		err = weight.Validate()
+		if err != nil {
+			res.Error = err.Error()
+			tmpl.ExecuteTemplate(w, "new.html", res)
+			return
+
+		}
+
+		found, err = wc.WeightRepo.FindByDate(weight.Date)
+		if err != nil {
+			if err != gorm.ErrRecordNotFound {
+				res.Error = err.Error()
+				tmpl.ExecuteTemplate(w, "new.html", res)
+				return
+			}
+		}
+
+		if found == (&models.Weight{}) {
+			res.Error = "Weight already in the database"
+			tmpl.ExecuteTemplate(w, "new.html", res)
+			return
+		}
+
+		newWeight, err := wc.WeightRepo.Save(weight)
+		if err != nil {
+			res.Error = err.Error()
+			tmpl.ExecuteTemplate(w, "new.html", res)
+			return
+
+		}
+
+		url := fmt.Sprintf("/weight/%d", newWeight.ID)
+
+		http.Redirect(w, r, url, http.StatusMovedPermanently)
+	}
 }

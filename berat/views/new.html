@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Isi Berat</title>
+</head>
+
+<body>
+    <form method="POST" action="insert">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date">
+        <br>
+        <br>
+        <label for="max">Max:</label>
+        <input type="text" id="max" name="max">
+        <br>
+        <br>
+        <label for="min">Min:</label>
+        <input type="text" id="min" name="min">
+        <br>
+        <br>
+        <input type="submit">
+    </form>
+    {{if .Error}}
+    <h4>Error: {{.Error}}</h4>
+    {{end}}
+    <h4>
+        <a href="/">Cancel</a>
+    </h4>
+</body>
+
+</html>

@@ -45,6 +45,8 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", weightController.Index).Methods("GET")
+	router.HandleFunc("/weight/new", weightController.New).Methods("GET")
+	router.HandleFunc("/weight/insert", weightController.Insert).Methods("POST")
 	router.HandleFunc("/weight/{id}", weightController.Detail).Methods("GET")
 
 	fmt.Println("Listening to port 8000")
