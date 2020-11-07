@@ -2,20 +2,17 @@ package models
 
 import (
 	"errors"
-	"time"
 
 	"github.com/jinzhu/gorm"
 )
 
 // Weight is the model entity for this application
 type Weight struct {
-	ID         uint64    `gorm:"primary_key;auto_increment"`
-	Date       string    `gorm:"not null;unique"`
-	Max        int       `gorm:"not null"`
-	Min        int       `gorm:"not null"`
-	Difference int       `gorm:"not null"`
-	CreatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	UpdatedAt  time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	ID         uint64 `gorm:"primary_key;auto_increment"`
+	Date       string `gorm:"not null;unique"`
+	Max        int    `gorm:"not null"`
+	Min        int    `gorm:"not null"`
+	Difference int    `gorm:"not null"`
 }
 
 // WeightRepository is the our wrapper for doing transaction to database
@@ -80,10 +77,23 @@ func (wr *WeightRepository) FindByID(id uint64) (*Weight, error) {
 	return &weight, nil
 }
 
+// FindByDate accept id type uint64 as parameter
+// It will get Weight data based on the date
+func (wr *WeightRepository) FindByDate(date string) (*Weight, error) {
+	var weight Weight
+
+	err := wr.DB.Where("date = ?", date).Take(&weight).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &weight, nil
+}
+
 // Update accept id type uint64 and Weight data as parameter
 // It will update the weight data in database based on the id
 func (wr *WeightRepository) Update(id uint64, newWeight *Weight) (*Weight, error) {
-	err := wr.DB.Where("id = ?", id).Updates(&newWeight).Error
+	err := wr.DB.Model(&Weight{}).Where("id = ?", id).Updates(&newWeight).Error
 	if err != nil {
 		return nil, err
 	}
