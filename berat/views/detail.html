@@ -24,9 +24,6 @@
     </style>
 </head>
 <body>
-    {{if .Error}}
-    <h1>{{.Error}}</h1>
-    {{else}}
     <table>
         <tr>
             <th>Tanggal</th>
@@ -45,6 +42,7 @@
             <td>{{.Data.Difference}}</td>
         </tr>
     </table>
-    {{end}}
+    <h3><a href="/weight/{{.Data.ID}}/edit">Edit</a></h3>
+    <h3><a href="/">Index</a></h3>
 </body>
 </html>

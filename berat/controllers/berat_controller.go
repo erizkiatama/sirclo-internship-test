@@ -13,9 +13,9 @@ import (
 type Response struct {
 	Data        interface{}
 	Error       string
-	AverageMax  float64
-	AverageMin  float64
-	AverageDiff float64
+	AverageMax  string
+	AverageMin  string
+	AverageDiff string
 }
 
 type WeightController struct {
@@ -45,9 +45,9 @@ func (wc *WeightController) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res.Data = weights
-	res.AverageMax = totalMax / size
-	res.AverageMin = totalMin / size
-	res.AverageDiff = totalDiff / size
+	res.AverageMax = fmt.Sprintf("%.2f", totalMax/size)
+	res.AverageMin = fmt.Sprintf("%.2f", totalMin/size)
+	res.AverageDiff = fmt.Sprintf("%.2f", totalDiff/size)
 
 	tmpl.ExecuteTemplate(w, "index.html", res)
 }
@@ -58,19 +58,17 @@ func (wc *WeightController) Detail(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		res.Error = err.Error()
-		tmpl.ExecuteTemplate(w, "detail.html", res)
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
 	}
 
 	weightID := uint64(id)
 
 	weight, err := wc.WeightRepo.FindByID(weightID)
 	if err != nil {
-		res.Error = err.Error()
-		tmpl.ExecuteTemplate(w, "detail.html", res)
+		http.Redirect(w, r, "/", http.StatusNotFound)
+		return
 	}
-
-	fmt.Println(weight)
 
 	res.Data = weight
 	tmpl.ExecuteTemplate(w, "detail.html", res)
