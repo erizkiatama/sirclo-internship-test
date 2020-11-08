@@ -49,6 +49,6 @@ func main() {
 
 	controllers.NewWeightController(weightRepo, template, router)
 
-	fmt.Println("Listening to port 8000")
-	log.Fatal(http.ListenAndServe(":8000", router))
+	fmt.Println("Listening to port 8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
