@@ -66,7 +66,7 @@ func (wr *WeightRepository) Save(weight *Weight) (*Weight, error) {
 func (wr *WeightRepository) FindAll() (*[]Weight, error) {
 	var weights []Weight
 
-	err := wr.DB.Find(&weights).Error
+	err := wr.DB.Order("date ASC").Find(&weights).Error
 	if err != nil {
 		return nil, err
 	}
