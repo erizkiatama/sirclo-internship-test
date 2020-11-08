@@ -111,7 +111,6 @@ func (wc *WeightController) New(w http.ResponseWriter, r *http.Request) {
 func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
 	res := new(Response)
 	weight := new(models.Weight)
-	found := new(models.Weight)
 
 	if r.Method == "POST" {
 		date := r.FormValue("date")
@@ -147,7 +146,7 @@ func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		found, err = wc.WeightRepo.FindByDate(weight.Date)
+		found, err := wc.WeightRepo.FindByDate(weight.Date)
 		if err != nil {
 			if err != gorm.ErrRecordNotFound {
 				res.Error = err.Error()

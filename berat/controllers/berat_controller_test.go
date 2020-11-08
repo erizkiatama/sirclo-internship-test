@@ -26,10 +26,9 @@ import (
 
 type Suite struct {
 	suite.Suite
-	repo       *mocks.WeightRepository
-	controller controllers.WeightController
-	weight     *models.Weight
-	router     *mux.Router
+	repo   *mocks.WeightRepository
+	weight *models.Weight
+	router *mux.Router
 }
 
 func (s *Suite) SetupSuite() {
