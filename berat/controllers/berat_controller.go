@@ -25,6 +25,24 @@ type Response struct {
 type WeightController struct {
 	WeightRepo models.Repository
 	Template   *template.Template
+	Router     *mux.Router
+}
+
+// NewWeightController creates new WeightController
+// and defines the route that the controller have
+func NewWeightController(wr models.Repository, tmpl *template.Template, r *mux.Router) {
+	wc := &WeightController{
+		WeightRepo: wr,
+		Template:   tmpl,
+		Router:     r,
+	}
+
+	r.HandleFunc("/", wc.Index).Methods("GET")
+	r.HandleFunc("/weight/new", wc.New).Methods("GET")
+	r.HandleFunc("/weight/insert", wc.Insert).Methods("POST")
+	r.HandleFunc("/weight/{id}", wc.Detail).Methods("GET")
+	r.HandleFunc("/weight/{id}/edit", wc.Edit).Methods("GET")
+	r.HandleFunc("/weight/{id}/update", wc.Update).Methods("POST")
 }
 
 // Index is function for the index view,

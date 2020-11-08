@@ -35,18 +35,8 @@ type Suite struct {
 func (s *Suite) SetupSuite() {
 	template := template.Must(template.ParseGlob("../views/*.html"))
 	s.repo = new(mocks.WeightRepository)
-	controller := controllers.WeightController{
-		WeightRepo: s.repo,
-		Template:   template,
-	}
-
 	s.router = mux.NewRouter()
-	s.router.HandleFunc("/", controller.Index).Methods("GET")
-	s.router.HandleFunc("/weight/new", controller.New).Methods("GET")
-	s.router.HandleFunc("/weight/insert", controller.Insert).Methods("POST")
-	s.router.HandleFunc("/weight/{id}", controller.Detail).Methods("GET")
-	s.router.HandleFunc("/weight/{id}/edit", controller.Edit).Methods("GET")
-	s.router.HandleFunc("/weight/{id}/update", controller.Update).Methods("POST")
+	controllers.NewWeightController(s.repo, template, s.router)
 }
 
 func (s *Suite) BeforeTest(_, _ string) {
