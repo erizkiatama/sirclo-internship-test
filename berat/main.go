@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"text/template"
 
 	"github.com/gorilla/mux"
 
@@ -40,8 +41,12 @@ func main() {
 
 	db := initDB(os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
 
-	weightRepo := models.WeightRepository{DB: db}
-	weightController := controllers.WeightController{WeightRepo: weightRepo}
+	template := template.Must(template.ParseGlob("views/*.html"))
+	weightRepo := &models.WeightRepository{DB: db}
+	weightController := controllers.WeightController{
+		WeightRepo: weightRepo,
+		Template:   template,
+	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", weightController.Index).Methods("GET")
