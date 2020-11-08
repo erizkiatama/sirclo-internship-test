@@ -11,6 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Response is struct for sending response data to HTML templates
 type Response struct {
 	Data        interface{}
 	Error       string
@@ -19,11 +20,15 @@ type Response struct {
 	AverageDiff string
 }
 
+// WeightController is a wrapper for our controller
+// so it could use repository and template
 type WeightController struct {
 	WeightRepo models.Repository
 	Template   *template.Template
 }
 
+// Index is function for the index view,
+// showing all the weight data to the template
 func (wc *WeightController) Index(w http.ResponseWriter, r *http.Request) {
 	res := new(Response)
 
@@ -54,6 +59,8 @@ func (wc *WeightController) Index(w http.ResponseWriter, r *http.Request) {
 	wc.Template.ExecuteTemplate(w, "index.html", res)
 }
 
+// Detail is function for the detail view,
+// showing a detailed weight data based on id
 func (wc *WeightController) Detail(w http.ResponseWriter, r *http.Request) {
 	res := new(Response)
 
@@ -76,10 +83,13 @@ func (wc *WeightController) Detail(w http.ResponseWriter, r *http.Request) {
 	wc.Template.ExecuteTemplate(w, "detail.html", res)
 }
 
+// New is the function for showing new weight form in html template
 func (wc *WeightController) New(w http.ResponseWriter, r *http.Request) {
 	wc.Template.ExecuteTemplate(w, "new.html", nil)
 }
 
+// Insert is the function to actually insert the data
+// after the new weight form is submitted
 func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
 	res := new(Response)
 	weight := new(models.Weight)
@@ -151,6 +161,8 @@ func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Edit is function to show the edit weight form
+// with all the existing weight data from database
 func (wc *WeightController) Edit(w http.ResponseWriter, r *http.Request) {
 	weight := new(models.Weight)
 	res := &Response{Data: weight}
@@ -175,6 +187,8 @@ func (wc *WeightController) Edit(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Update is the function to actually update the weight data
+// when edit weight form is submitted
 func (wc *WeightController) Update(w http.ResponseWriter, r *http.Request) {
 	weight := new(models.Weight)
 	res := &Response{Data: weight}
