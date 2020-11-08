@@ -192,7 +192,7 @@ func (s *Suite) Test_Insert_When_Data_Is_Valid() {
 	s.weight.ID = 0
 
 	s.repo.On("Save", s.weight).Return(s.weight, nil).Once()
-	s.repo.On("FindByDate", s.weight.Date).Return(&models.Weight{}, nil).Once()
+	s.repo.On("FindByDate", s.weight.Date).Return(nil, nil).Once()
 
 	v := url.Values{}
 	v.Set("date", s.weight.Date)
@@ -216,7 +216,7 @@ func (s *Suite) Test_Insert_When_Data_Is_Invalid() {
 	newError := errors.New("Error saving to database")
 
 	s.repo.On("Save", s.weight).Return(&models.Weight{}, newError).Once()
-	s.repo.On("FindByDate", s.weight.Date).Return(&models.Weight{}, nil).Once()
+	s.repo.On("FindByDate", s.weight.Date).Return(nil, nil).Once()
 
 	v := url.Values{}
 	v.Set("date", s.weight.Date)

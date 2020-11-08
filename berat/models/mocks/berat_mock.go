@@ -36,6 +36,10 @@ func (_m *WeightRepository) FindByID(id uint64) (*models.Weight, error) {
 func (_m *WeightRepository) FindByDate(date string) (*models.Weight, error) {
 	args := _m.Called(date)
 
+	if _, ok := args.Get(0).(*models.Weight); !ok {
+		return nil, args.Error(1)
+	}
+
 	return args.Get(0).(*models.Weight), args.Error(1)
 }
 

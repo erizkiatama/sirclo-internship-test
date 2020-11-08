@@ -157,7 +157,7 @@ func (wc *WeightController) Insert(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if *found != (models.Weight{}) {
+		if found != nil {
 			res.Error = "Weight already in the database"
 			w.WriteHeader(http.StatusConflict)
 			wc.Template.ExecuteTemplate(w, "new.html", res)
