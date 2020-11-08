@@ -9,10 +9,10 @@ import (
 // Weight is the model entity for this application
 type Weight struct {
 	ID         uint64 `gorm:"primary_key;auto_increment"`
-	Date       string `gorm:"not null;unique"`
-	Max        int    `gorm:"not null"`
-	Min        int    `gorm:"not null"`
-	Difference int    `gorm:"not null"`
+	Date       string `gorm:"not null;unique;default:null"`
+	Max        int    `gorm:"not null;default:null"`
+	Min        int    `gorm:"not null;default:null"`
+	Difference int    `gorm:"not null;default:null"`
 }
 
 // Repository is an interace of repository for easy mocking

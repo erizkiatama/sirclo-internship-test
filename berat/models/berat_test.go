@@ -109,12 +109,12 @@ func (s *Suite) Test_Repository_Save_Given_Valid_Weight_Data() {
 func (s *Suite) Test_Repository_Save_Given_Invalid_Weight_Data() {
 	s.weight.Date = ""
 
-	sqlQuery := `INSERT INTO "weights" ("date","max","min","difference") 
-		VALUES ($1,$2,$3,$4) RETURNING "weights"."id"`
+	sqlQuery := `INSERT INTO "weights" ("max","min","difference") 
+		VALUES ($1,$2,$3) RETURNING "weights"."id"`
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectQuery(regexp.QuoteMeta(sqlQuery)).
-		WithArgs(s.weight.Date, s.weight.Max, s.weight.Min, s.weight.Difference).
+		WithArgs(s.weight.Max, s.weight.Min, s.weight.Difference).
 		WillReturnError(gorm.ErrInvalidTransaction)
 
 	res, err := s.repo.Save(s.weight)
